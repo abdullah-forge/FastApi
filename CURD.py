@@ -67,3 +67,24 @@ def get_post(id : int):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail=f"post with id : {id} was not found")
     return {"post_detail" : post}
+
+# Delete
+
+# Add Response to your fastapi imports at the top:
+from fastapi import FastAPI, status, HTTPException, Response
+
+# Add this helper function below find_post
+def find_index_post(id):
+    for i, p in enumerate(my_post):
+        if p['id'] == id:
+            return i
+
+# Add this DELETE route at the bottom
+@app.delete("/posts/{id}")
+def delete_post(id : int):
+    index = find_index_post(id)
+    if index == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Post with id {id} does not exit")
+    my_post.pop(index)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
