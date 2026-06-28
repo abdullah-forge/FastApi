@@ -52,3 +52,15 @@ def create_posts(post : Post):
     new_post = cursor.fetchone()
     conn.commit()
     return {"data": new_post}
+
+
+# Part 4: Added DELETE route to remove records from the database.
+@app.delete("/posts/{id}")
+def delete_post(id : int):
+    cursor.execute("""DELETE FROM "Post"."Post" WHERE id = %s RETURNING *""", (str(id),))
+    deleted_post = cursor.fetchone()
+    conn.commit()
+    if deleted_post == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail = f"Post with id {id} does not exit")
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
