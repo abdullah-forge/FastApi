@@ -42,3 +42,13 @@ def get_post(id : int):
         raise HTTPException (status_code= status.HTTP_404_NOT_FOUND, 
                              detail = f"post with id : {id} was not found")
     return {"post_detail" : post}
+
+# Part 3: Added POST route to insert new records into the database.
+@app.post("/posts", status_code=status.HTTP_201_CREATED)
+def create_posts(post : Post):
+    cursor.execute("""INSERT INTO "Post"."Post" (title, content, published) VALUES (%s, %s, %s) RETURNING *""",
+        (post.title, post.content, post.published)
+    )
+    new_post = cursor.fetchone()
+    conn.commit()
+    return {"data": new_post}
