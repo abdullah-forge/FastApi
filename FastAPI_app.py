@@ -31,3 +31,14 @@ while True:
         print("connection to database failed")
         print("Error : ",error)
         time.sleep(2)
+
+
+# Part 2: Implemented GET route to fetch posts from database.
+@app.get("/posts/{id}")
+def get_post(id : int):
+    cursor.execute("""SELECT * FROM "Post"."Post" WHERE id = %s """, (str(id),))
+    post = cursor.fetchone()
+    if not post:
+        raise HTTPException (status_code= status.HTTP_404_NOT_FOUND, 
+                             detail = f"post with id : {id} was not found")
+    return {"post_detail" : post}
