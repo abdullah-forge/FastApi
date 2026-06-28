@@ -64,3 +64,18 @@ def delete_post(id : int):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail = f"Post with id {id} does not exit")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+# Part 5: Added PUT route to update existing database records.
+@app.put("/posts/{id}")
+def update_post(id : int, post :Post):
+    cursor.execute(
+        """UPDATE "Post"."Post" SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *""",
+        (post.title, post.content, post.published, str(id))
+    )
+    updated_post = cursor.fetchone()
+    conn.commit()
+    if updated_post == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail = f"Post with id {id} does not exit")
+    return{"data" : updated_post}
