@@ -32,3 +32,16 @@ class Post(Base):
     content = Column(String, nullable=False)
     published = Column(Boolean, server_default='True')
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+
+#schemas.py
+
+from pydantic import BaseModel
+from typing import Optional
+
+class PostBase(BaseModel):
+    title: str
+    content: str
+    published: bool = True
+
+class PostCreate(PostBase):
+    pass
