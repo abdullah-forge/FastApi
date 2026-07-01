@@ -33,6 +33,26 @@ from . import models
 app = FastAPI()
 
 models.Base.metadata.create_all(bind=engine)
+####main.py
+from fastapi import FastAPI, Depends, status
+from sqlalchemy.orm import Session
+
+from . import models, schemas
+from .database import engine, get_db
+
+app = FastAPI()
+
+models.Base.metadata.create_all(bind=engine)
+
+
+@app.post("/posts", status_code=status.HTTP_201_CREATED)
+def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
+    new_post = models.Post(**post.model_dump())
+    db.add(new_post)
+    db.commit()
+    db.refresh(new_post)
+    return new_post
+    
 
 #models.py
 from .database import Base
@@ -57,3 +77,16 @@ class Post(Base):
     )
 
 
+#Add Pydantic schemas and implement create post endpoint
+#schemas.py
+from pydantic import BaseModel
+
+class PostBase(BaseModel):
+    title: str
+    content: str
+    published: bool = True
+
+
+class PostCreate(PostBase):
+    pass
+    
